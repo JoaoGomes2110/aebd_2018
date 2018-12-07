@@ -1,24 +1,83 @@
-DBA_TABLESPACE_USAGE_METRICS
-DBA_CPU_USAGE_STATISTICS
-DBA_DATA_FILES
 DBA_TEMP_FILES
 DBA_PROFILES
+
+/*Entidade Users*/
 DBA_USERS
+CDB_USERS
+
+/*Entidade Tablespaces*/
+DBA_TABLESPACES
+CDB_TABLESPACES
+DBA_TABLESPACE_USAGE_METRICS
+CDB_TABLESPACE_USAGE_METRICS
+
+/*Entidade DataFiles*/
+DBA_DATA_FILES
+CDB_DATA_FILES
+
+/*Entidade Roles*/
 DBA_ROLES
 DBA_ROLES_PRIV
 DBA_ROLE_PRIVS
-Sessions_privs
+CDB_ROLES
+CDB_ROLE_PRIVS
 ROLE_ROLE_PRIVS
+
+/*Entidade Grants*/
+ALL_TABL_PRIVS
+
+Sessions_privs
+
 DBA_TS_QUOTAS
 DBA_REGISTRY_DATABASE
 DBA_SOURCE_AE
+v_$Session_connect_info
+v_$SESSION
+
+serviços
+all_Services
+
+CPU
+v_$parameter
+DBA_CPU_USAGE_STATISTICS
 
 
-CDB_ROLES
-CDB_USERS
+
+
 CDB_PRIVS
-CDB_TABLESPACES
-CDB_DATA_FILES
+
 CDB_TEMP_FILES
 CDB_TEMP_FREE_SPACE
 CDB_TS_QUOTAS
+
+memory
+v_$sga
+v_$process (pga)
+v_$SGASTAT
+
+v_$SQL_MONITOR
+
+v_$RSRCPDBMETRIC_HISTORY
+
+
+/*CPU por sessões ativas*/
+SELECT
+   s.username,
+   t.sid,
+   s.serial#,
+   SUM(VALUE/100) as "cpu usage (seconds)"
+FROM
+   v$session s,
+   v$sesstat t,
+   v$statname n
+WHERE
+   t.STATISTIC# = n.STATISTIC#
+AND
+   NAME like '%CPU used by this session%'
+AND
+   t.SID = s.SID
+AND
+   s.status='ACTIVE'
+AND
+   s.username is not null
+GROUP BY username,t.sid,s.serial#;
