@@ -22,4 +22,38 @@ SELECT FILE_NAME, FILE_ID, TABLESPACE_NAME, BYTES, STATUS, AUTOEXTENSIBLE,
 USER_BYTES
 FROM DBA_DATA_FILES;
 
-/**/
+/*Sessions*/
+SELECT SECONDS_IN_WAIT
+FROM V_$SESSION;
+
+SELECT
+   s.username,
+   t.sid,
+   s.serial#,
+   s.seconds_in_wait,
+   SUM(VALUE/100) as "cpu usage (seconds)"
+FROM
+   v$session s,
+   v$sesstat t,
+   v$statname n
+WHERE
+   t.STATISTIC# = n.STATISTIC#
+AND
+   NAME like '%CPU used by this session%'
+AND
+   t.SID = s.SID
+AND
+   s.status='ACTIVE'
+AND
+   s.username is not null
+GROUP BY username,t.sid,s.serial#,s.seconds_in_wait;
+
+/*Memory*/
+SELECT
+    s.name as SGA_NAME,
+    s.value as SGA_VALUE,
+    p.pga_max_mem as DATA_STORAGE,
+    p.pname as PGA
+FROM 
+    v$sga s,
+    v$process p;
