@@ -48,10 +48,12 @@ GROUP BY username,t.sid,s.serial#,s.seconds_in_wait;
 
 /*Memory*/
 SELECT
+    st.name as POOL_NAME,
     s.name as SGA_NAME,
     s.value as SGA_VALUE,
     p.pga_max_mem as DATA_STORAGE,
     p.pname as PGA
 FROM 
+    v$sgastat st,
     v$sga s,
     v$process p;
