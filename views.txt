@@ -25,6 +25,7 @@ ROLE_ROLE_PRIVS
 
 /*Entidade Grants*/
 ALL_TABL_PRIVS
+dba_sys_privs
 
 Sessions_privs
 
@@ -40,10 +41,6 @@ all_Services
 CPU
 v_$parameter
 DBA_CPU_USAGE_STATISTICS
-
-
-
-
 CDB_PRIVS
 
 CDB_TEMP_FILES
