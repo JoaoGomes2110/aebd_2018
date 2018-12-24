@@ -1,0 +1,13 @@
+$(()=>{
+    $('#tabelaUsers').load('http://localhost:5005/users')
+    $('#tabelaUsersHistory').load('http://localhost:5005/users/history')
+    $('#tabelaTablespaces').load('http://localhost:5005/tablespaces')
+    $('#tabelaTablespacesHistory').load('http://localhost:5005/tablespaces/history')
+    $('#tabelaDatafiles').load('http://localhost:5005/datafiles')
+    $('#tabelaDatafilesHistory').load('http://localhost:5005/datafiles/history')
+    $('#tabelaSessions').load('http://localhost:5005/sessions')
+    $('#tabelaSessionsHistory').load('http://localhost:5005/sessions/history')
+    $('#tabelaMemory').load('http://localhost:5005/memory')
+    $('#tabelaMemoryHistory').load('http://localhost:5005/memory/history')
+    $('#tabelaRoles').load('http://localhost:5005/roles')
+})
