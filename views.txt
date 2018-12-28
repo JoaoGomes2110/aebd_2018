@@ -50,6 +50,7 @@ CDB_TS_QUOTAS
 memory
 v_$sga
 v_$process (pga)
+V$PGASTAT
 v_$SGASTAT
 
 v_$SQL_MONITOR

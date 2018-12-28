@@ -76,6 +76,7 @@ for row in res:
     curI.execute(query)
     jjnm.commit()
 
+
 #--------TABLESPACES_USERS---------#
 tabus_del = """DELETE FROM TABLESPACE_USER"""
 curI.execute(tabus_del)
