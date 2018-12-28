@@ -135,6 +135,13 @@ for row in res:
 sessions_del = """DELETE FROM SESSIONS"""
 curI.execute(sessions_del)
 
+sessions_drop_seq = """DROP SEQUENCE sessions_inc"""
+curI.execute(sessions_drop_seq)
+sessions_cre_seq = """CREATE SEQUENCE sessions_inc START WITH 1"""
+curI.execute(sessions_cre_seq)
+
+
+
 sessions_ST = """
         SELECT
         s.username,
@@ -173,6 +180,11 @@ for row in res:
 #---------Memory--------#
 memory_del = """DELETE FROM MEMORY_T"""
 curI.execute(memory_del)
+
+memory_drop_seq = """DROP SEQUENCE memory_inc"""
+curI.execute(memory_drop_seq)
+memory_cre_seq = """CREATE SEQUENCE memory_inc START WITH 1"""
+curI.execute(memory_cre_seq)
 
 memory_ST1 = """
         SELECT
