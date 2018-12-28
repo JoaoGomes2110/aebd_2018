@@ -171,7 +171,7 @@ for row in res:
         jjnm.commit()
 
 #---------Memory--------#
-memory_del = """DELETE FROM SESSIONS"""
+memory_del = """DELETE FROM MEMORY_T"""
 curI.execute(memory_del)
 
 memory_ST1 = """
