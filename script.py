@@ -136,15 +136,14 @@ sessions_del = """DELETE FROM SESSIONS"""
 curI.execute(sessions_del)
 
 sessions_ST = """
-        SELECT SECONDS_IN_WAIT
-        FROM V_$SESSION;
-
         SELECT
         s.username,
         t.sid,
         s.serial#,
         s.seconds_in_wait,
-        SUM(VALUE/100) as "cpu usage (seconds)"
+        SUM(VALUE/100) as "cpu usage (seconds)",
+        (select us.user_id from DBA_USERS us
+        where(us.username = s.username)) AS USER_ID
         FROM
         v$session s,
         v$sesstat t,
@@ -162,14 +161,107 @@ sessions_ST = """
         GROUP BY username,t.sid,s.serial#,s.seconds_in_wait
         """
 
-#res = cur.execute(sessions_ST)
+res = cur.execute(sessions_ST)
 
 for row in res:
         query = """INSERT INTO SESSIONS(
-                SESSIONS_ID,CPU,WAIT_SESSIONS,USER_ID)
-                VALUES('%d','%s','%d','%s','%s','%d','%s')""" % (row[1],row[0],row[6],row[5],row[4],row[3],row[2])
-        #curI.execute(query)
-        #jjnm.commit()
+                CPU,WAIT_SESSIONS,USER_ID)
+                VALUES('%d','%d','%d')""" % (row[4],row[3],row[5])
+        curI.execute(query)
+        jjnm.commit()
 
+#---------Memory--------#
+memory_del = """DELETE FROM SESSIONS"""
+curI.execute(memory_del)
+
+memory_ST1 = """
+        SELECT
+        s.name,s.bytes/(1024*1024) MB 
+        FROM
+        v$sgastat s
+        where s.name = 'buffer_cache'
+        or s.name = 'shared_io_pool'
+        """
+memory_ST2 = """
+        SELECT
+        st.name,st.bytes/(1024*1024) MB
+        FROM
+        v_$sgainfo st
+        where  st.name ='Java Pool Size'
+                or st.name ='Streams Pool Size'
+                or st.name ='Large Pool Size'
+                or st.name ='Shared Pool Size'
+        """
+memory_ST3 = """
+        SELECT
+        sum(pga_used_mem)/(1024*1024)
+        FROM 
+        v$process p
+        """
+memory_ST4 = """
+        select sum(max(bytes)/1024/1024) from dba_hist_sgastat where pool is not null group by pool
+        """  
+dataStorage_ST = """SELECT
+                SUM((p.pga_max_mem)/1024/1024/1024) as DATA_STORAGE
+                FROM
+                v$process p"""
+
+res = cur.execute(memory_ST1)
+for row in res:
+        if(row[0]=='buffer_cache'):
+                query = """INSERT INTO MEMORY_T(
+                        BUFFER_CACHE_MEMORY,NAME_TABLESPACE)
+                        VALUES('%d','%s')""" % (row[1],'SYSTEM')
+        else:
+                query = """INSERT INTO MEMORY_T(
+                        SHARED_IO_POOL,NAME_TABLESPACE)
+                        VALUES('%d','%s')""" % (row[1],'SYSTEM')
+        curI.execute(query)
+        jjnm.commit()
+res = cur.execute(memory_ST2)
+
+for row in res:
+        if(row[0]=='Java Pool Size'):
+                query = """INSERT INTO MEMORY_T(
+                        JAVA_POOL,NAME_TABLESPACE)
+                        VALUES('%d','%s')""" % (row[1],'SYSTEM')
+        if(row[0]=='Large Pool Size'):
+                query = """INSERT INTO MEMORY_T(
+                        LARGE_POOL,NAME_TABLESPACE)
+                        VALUES('%d','%s')""" % (row[1],'SYSTEM')
+        if(row[0]=='Shared Pool Size'):
+                query = """INSERT INTO MEMORY_T(
+                        SHARED_POOL_MEMORY,NAME_TABLESPACE)
+                        VALUES('%d','%s')""" % (row[1],'SYSTEM')
+        if(row[0]=='Streams Pool Size'):
+                query = """INSERT INTO MEMORY_T(
+                        STREAM_POOL,NAME_TABLESPACE)
+                        VALUES('%d','%s')""" % (row[1],'SYSTEM')
+        curI.execute(query)
+        jjnm.commit()
+res = cur.execute(memory_ST3)
+
+for row in res:
+        query = """INSERT INTO MEMORY_T(
+                   PGA,NAME_TABLESPACE)
+                   VALUES('%d','%s')""" % (row[0],'SYSTEM')
+        curI.execute(query)
+        jjnm.commit()
+res = cur.execute(memory_ST4)
+
+for row in res:
+        query = """INSERT INTO MEMORY_T(
+                   SGA,NAME_TABLESPACE)
+                   VALUES('%d','%s')""" % (row[0],'SYSTEM')
+        curI.execute(query)
+        jjnm.commit()
+res = cur.execute(dataStorage_ST)
+
+for row in res:
+        query = """INSERT INTO MEMORY_T(
+                   DATA_STORAGE,NAME_TABLESPACE)
+                   VALUES('%d','%s')""" % (row[0],'SYSTEM')
+        curI.execute(query)
+        jjnm.commit()
 cur.close()
 curI.close()

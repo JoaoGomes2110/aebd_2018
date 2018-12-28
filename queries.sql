@@ -54,15 +54,16 @@ FROM DBA_DATA_FILES;
 
 
 /*Sessions*/
-SELECT SECONDS_IN_WAIT
-FROM V_$SESSION;
+select distinct serial# from v$session;
 
 SELECT
    s.username,
    t.sid,
    s.serial#,
    s.seconds_in_wait,
-   SUM(VALUE/100) as "cpu usage (seconds)"
+   SUM(VALUE/100) as "cpu usage (seconds)",
+   (select us.user_id from DBA_USERS us
+    where(us.username = s.username)) AS USER_ID
 FROM
    v$session s,
    v$sesstat t,
@@ -81,12 +82,63 @@ GROUP BY username,t.sid,s.serial#,s.seconds_in_wait;
 
 /*Memory*/
 SELECT
-    st.name as POOL_NAME,
-    s.name as SGA_NAME,
+    SUM((p.pga_max_mem)/1024/1024/1024) as DATA_STORAGE
+    FROM
+    v$process p;
+SELECT
     s.value as SGA_VALUE,
-    p.pga_max_mem as DATA_STORAGE,
-    p.pname as PGA
+    p.pga_max_mem as DATA_STORAGE
+    --p.pname as PGA
 FROM 
     v$sgastat st,
     v$sga s,
     v$process p;
+SELECT
+    sum(pga_used_mem)/(1024*1024)
+FROM 
+    v$process p;
+select * 
+from(
+   select 
+      name, bytes/(1024*1024) MB 
+   from 
+      v$sgastat 
+   where 
+      pool ='shared pool' 
+   order by 
+      bytes desc
+   ) 
+where rownum < 20;
+select * from v$java_pool_advice;
+select (sum(value))/(1024*1024) from v$sga;
+select name,value/(1024*1024) from v$pgastat; 
+select * --value/(1024*1024)
+FROM
+    v$statname stat1
+    where stat1.name = 'session pga memory';
+
+SELECT
+     s.pool, s.name, s.bytes/(1024*1024) MB 
+FROM
+     v$sgastat s
+where s.name = 'buffer_cache'
+      or s.name = 'shared_io_pool';
+    
+SELECT
+    st.name,st.bytes/(1024*1024) MB
+FROM
+    v_$sgainfo st
+    where  st.name ='Java Pool Size'
+        or st.name ='Streams Pool Size'
+        or st.name ='Large Pool Size'
+        or st.name ='Shared Pool Size';
+        
+select sum(value)/1024/1024 Total_size_In_MB from V$sga;
+Select ((select sum(sg.value)/1024/1024 Total_size_In_MB from V$sga sg ) - sum(s.bytes/1024/1024))
+     From V$sgastat s
+     Where Name Like '%free memory%';
+     
+select name,value/(1024*1024) from v$pgastat where name='total PGA inuse';
+select bytes/(1024*1024) from v$sgastat;
+
+ select sum(max(bytes)/1024/1024) from dba_hist_sgastat where pool is not null group by pool;
