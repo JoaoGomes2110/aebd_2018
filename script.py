@@ -76,7 +76,26 @@ for row in res:
     curI.execute(query)
     jjnm.commit()
 
+#----------USER_HAS_ROLE---------#
+tab_del = """DELETE FROM USER_HAS_ROLE"""
+curI.execute(tab_del)
 
+user_has_role_ST = """
+                SELECT US.USER_ID, RLS.ROLE_ID
+                FROM DBA_ROLES RLS
+                INNER JOIN DBA_ROLE_PRIVS RLP
+                ON RLS.ROLE = RLP.GRANTED_ROLE
+                INNER JOIN DBA_USERS US
+                ON RLP.GRANTEE = US.USERNAME
+                """
+res = cur.execute(user_has_role_ST)
+
+for row in res:
+    query = """INSERT INTO USER_HAS_ROLE(
+                USER_ID,ROLE_ID)
+                VALUES('%d','%d')""" % (row[0],row[1])
+    curI.execute(query)
+    jjnm.commit()
 #--------TABLESPACES_USERS---------#
 tabus_del = """DELETE FROM TABLESPACE_USER"""
 curI.execute(tabus_del)
