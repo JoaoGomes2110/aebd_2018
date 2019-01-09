@@ -60,19 +60,19 @@ tab_del = """DELETE FROM TABLESPACE_T"""
 curI.execute(tab_del)
 
 tablespace_ST = """
-                SELECT TBS.TABLESPACE_NAME,USG.USED_PERCENT,TBS.MAX_SIZE,TBS.STATUS,TBS.CONTENTS,DF.FILE_NAME,DF.AUTOEXTENSIBLE,
+                SELECT DISTINCT TBS.TABLESPACE_NAME,USG.USED_PERCENT,TBS.MAX_SIZE,TBS.STATUS,TBS.CONTENTS,
                 USG.TABLESPACE_SIZE,(TABLESPACE_SIZE - USED_SPACE) AS FREE_SPACE
-                FROM DBA_TABLESPACE_USAGE_METRICS  USG, DBA_TABLESPACES  TBS, DBA_DATA_FILES  DF
-                WHERE TBS.TABLESPACE_NAME = USG.TABLESPACE_NAME AND TBS.TABLESPACE_NAME = DF.TABLESPACE_NAME
+                FROM DBA_TABLESPACE_USAGE_METRICS  USG, DBA_TABLESPACES  TBS
+                WHERE TBS.TABLESPACE_NAME = USG.TABLESPACE_NAME
                 """
 res = cur.execute(tablespace_ST)
 
 for row in res:
     query = """INSERT INTO TABLESPACE_T(
                 NAME_TABLESPACE,SIZE_TABLESPACE,FREE_SPACE,
-                USED,TYPE_TABLESPACE,DIRECTORY_TABLESPACE,
-                AUTO_EXTEND,MAX_SIZE,STATUS)
-                VALUES('%s','%d','%d','%d','%s','%s','%s','%d','%s')""" % (row[0],row[7], row[8], row[1],row[4], row[5],row[6],row[2],row[3])
+                USED,TYPE_TABLESPACE,
+                MAX_SIZE,STATUS)
+                VALUES('%s','%d','%d','%d','%s','%d','%s')""" % (row[0],row[5], row[6], row[1],row[4],row[2],row[3])
     curI.execute(query)
     jjnm.commit()
 
@@ -191,9 +191,9 @@ sessions_ST = """
 res = cur.execute(sessions_ST)
 
 for row in res:
-        query = """INSERT INTO SESSIONS(
+        query = """INSERT INTO SESSIONS(USERNAME,SERIAL,
                 CPU,WAIT_SESSIONS,USER_ID)
-                VALUES('%d','%d','%d')""" % (row[4],row[3],row[5])
+                VALUES('%s','%d','%d','%d','%d')""" % (row[0],row[2],row[4],row[3],row[5])
         curI.execute(query)
         jjnm.commit()
 
