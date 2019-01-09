@@ -76,7 +76,7 @@ for row in res:
     curI.execute(query)
     jjnm.commit()
 
-#----------USER_HAS_ROLE---------#
+#-----------USER_HAS_ROLE----------#
 tab_del = """DELETE FROM USER_HAS_ROLE"""
 curI.execute(tab_del)
 
