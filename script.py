@@ -11,7 +11,7 @@ curI = jjnm.cursor()
 
 #-------USERS-------#
 users_del = """DELETE FROM USER_T"""
-curI.execute(users_del)
+#curI.execute(users_del)
 
 users_ST = """
         SELECT USERNAME, ACCOUNT_STATUS, EXPIRY_DATE, CREATED,
@@ -27,15 +27,26 @@ for row in res:
         USER_ID,USERNAME,EXPIRATION_DATE,
         STATUS,CREATED_DATE)
         VALUES ('%d','%s',TO_DATE('%s','dd.mm.yyyy'),'%s',TO_DATE('%s','dd.mm.yyyy')) """ % (int(row[4]), row[0], ed, row[1], row[3].strftime('%d.%m.%Y'))
-        curI.execute(query1)
+        queryU = """ UPDATE USER_T
+                SET USER_ID = :id,
+                USERNAME = :n,
+                EXPIRATION_DATE = TO_DATE(:ed,'dd.mm.yyyy'),
+                STATUS = :s,
+                CREATED_DATE = TO_DATE(:cd,'dd.mm.yyyy')
+                where USER_ID = :id
+        """
+        
+        #curI.execute(queryU,(row[4],row[0],ed,row[1],row[3].strftime('%d.%m.%Y'),row[4]))
+        curI.execute(queryU,{'id':row[4],'n':row[0],'ed':ed,'s':row[1],'cd':row[3].strftime('%d.%m.%Y')})
+        #curI.execute(query1)
     else:
         ed = 'null'
         query2 = """INSERT INTO USER_T(
         USER_ID,USERNAME,EXPIRATION_DATE,
         STATUS,CREATED_DATE)
         VALUES ('%d','%s',TO_DATE(%s,'dd.mm.yyyy'),'%s',TO_DATE('%s','dd.mm.yyyy')) """ % (int(row[4]), row[0],ed, row[1], row[3].strftime('%d.%m.%Y'))
-        curI.execute(query2)
-    jjnm.commit()
+        #curI.execute(query2)
+    #jjnm.commit()
 
 
 #--------ROLES--------#
@@ -153,7 +164,7 @@ for row in res:
 
 #---------SESSIONS----------#
 sessions_del = """DELETE FROM SESSIONS"""
-curI.execute(sessions_del)
+#curI.execute(sessions_del)
 
 sessions_drop_seq = """DROP SEQUENCE sessions_inc"""
 curI.execute(sessions_drop_seq)
@@ -194,7 +205,20 @@ for row in res:
         query = """INSERT INTO SESSIONS(USERNAME,SERIAL,
                 CPU,WAIT_SESSIONS,USER_ID)
                 VALUES('%s','%d','%d','%d','%d')""" % (row[0],row[2],row[4],row[3],row[5])
-        curI.execute(query)
+        queryU = """
+                UPDATE SESSIONS
+                        SET USERNAME = :u,
+                        SERIAL = :s,
+                        CPU = :c,
+                        WAIT_SESSIONS = :ws,
+                        USER_ID = :id
+                WHERE SERIAL = :s
+                """
+        rowCount = curI.execute(queryU,{'u':row[0],'s':row[2],'c':row[4],'ws':row[3],'id':row[5]})
+        
+        if curI.rowcount == 0:
+                curI.execute(query)
+        #curI.execute(query)
         jjnm.commit()
 
 #---------Memory--------#
