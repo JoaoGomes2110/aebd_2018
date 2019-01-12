@@ -10,9 +10,6 @@ jjnm = cx_Oracle.connect('jjnm/oracle@localhost:1521/orcl')
 curI = jjnm.cursor()
 
 #-------USERS-------#
-users_del = """DELETE FROM USER_T"""
-#curI.execute(users_del)
-
 users_ST = """
         SELECT USERNAME, ACCOUNT_STATUS, EXPIRY_DATE, CREATED,
         USER_ID, DEFAULT_TABLESPACE
@@ -35,41 +32,58 @@ for row in res:
                 CREATED_DATE = TO_DATE(:cd,'dd.mm.yyyy')
                 where USER_ID = :id
         """
-        
-        #curI.execute(queryU,(row[4],row[0],ed,row[1],row[3].strftime('%d.%m.%Y'),row[4]))
-        curI.execute(queryU,{'id':row[4],'n':row[0],'ed':ed,'s':row[1],'cd':row[3].strftime('%d.%m.%Y')})
-        #curI.execute(query1)
+
+        curI.execute(queryU,{'id':row[4],'n':row[0],'ed':ed,'s':row[1],'cd':row[3]})
+        if curI.rowcount ==0:
+                curI.execute(query1,{'id':row[4],'n':row[0],'ed':ed,'s':row[1],'cd':row[3].strftime('%d.%m.%Y')})
     else:
         ed = 'null'
+        queryU = """ UPDATE USER_T
+                SET USER_ID = :id,
+                USERNAME = :n,
+                EXPIRATION_DATE = TO_DATE(:ed,'dd.mm.yyyy'),
+                STATUS = :s,
+                CREATED_DATE = TO_DATE(:cd,'dd.mm.yyyy')
+                where USER_ID = :id
+        """
+
         query2 = """INSERT INTO USER_T(
         USER_ID,USERNAME,EXPIRATION_DATE,
         STATUS,CREATED_DATE)
-        VALUES ('%d','%s',TO_DATE(%s,'dd.mm.yyyy'),'%s',TO_DATE('%s','dd.mm.yyyy')) """ % (int(row[4]), row[0],ed, row[1], row[3].strftime('%d.%m.%Y'))
-        #curI.execute(query2)
-    #jjnm.commit()
+        VALUES ('%d','%s',TO_DATE(%s,'dd.mm.yyyy'),'%s',TO_DATE('%s','dd.mm.yyyy')) """ % (row[4], row[0],ed, row[1], row[3].strftime('%d.%m.%Y'))
+
+        curI.execute(queryU,{'id':row[4],'n':row[0],'ed':ed,'s':row[1],'cd':row[3]})
+        if curI.rowcount ==0:
+                curI.execute(query2,{'id':row[4],'n':row[0],'ed':ed,'s':row[1],'cd':row[3].strftime('%d.%m.%Y')})
+
+    jjnm.commit()
 
 
 #--------ROLES--------#
-roles_del = """DELETE FROM ROLE_T"""
-curI.execute(roles_del)
-
 roles_ST = """SELECT RLS.ROLE, RLS.ROLE_ID, RLS.AUTHENTICATION_TYPE, RLS.COMMON
                 FROM DBA_ROLES RLS"""
 
 res = cur.execute(roles_ST)
 
 for row in res:
-    query = """INSERT INTO ROLE_T(
+        queryU = """
+                UPDATE ROLE_T
+                        SET NAME_ROLE = :n,
+                        COMMON = :c,
+                        AUTHENTICATION_ROLE = :a
+                WHERE ROLE_ID = :id
+                """ 
+        query = """INSERT INTO ROLE_T(
                 ROLE_ID,NAME_ROLE,COMMON,
                 AUTHENTICATION_ROLE)
                 VALUES('%d','%s','%s','%s')""" % (int(row[1]), row[0], row[3], row[2])
-    curI.execute(query)
-    jjnm.commit()
+        
+        curI.execute(queryU,{'id':row[1],'n':row[0],'c':row[3],'a':row[2]})
+        if curI.rowcount == 0:
+                curI.execute(query)
+        jjnm.commit()
 
 #---------TABLESPACES---------#
-tab_del = """DELETE FROM TABLESPACE_T"""
-curI.execute(tab_del)
-
 tablespace_ST = """
                 SELECT DISTINCT TBS.TABLESPACE_NAME,USG.USED_PERCENT,TBS.MAX_SIZE,TBS.STATUS,TBS.CONTENTS,
                 USG.TABLESPACE_SIZE,(TABLESPACE_SIZE - USED_SPACE) AS FREE_SPACE
@@ -78,14 +92,28 @@ tablespace_ST = """
                 """
 res = cur.execute(tablespace_ST)
 
-for row in res:
-    query = """INSERT INTO TABLESPACE_T(
+for row in res: 
+        queryU = """
+                UPDATE TABLESPACE_T
+                        SET SIZE_TABLESPACE = :si,
+                        FREE_SPACE = :f,
+                        USED = :u,
+                        TYPE_TABLESPACE = :t,
+                        MAX_SIZE = :m,
+                        STATUS = :s
+                WHERE NAME_TABLESPACE = :n
+                """
+
+        query = """INSERT INTO TABLESPACE_T(
                 NAME_TABLESPACE,SIZE_TABLESPACE,FREE_SPACE,
                 USED,TYPE_TABLESPACE,
                 MAX_SIZE,STATUS)
                 VALUES('%s','%d','%d','%d','%s','%d','%s')""" % (row[0],row[5], row[6], row[1],row[4],row[2],row[3])
-    curI.execute(query)
-    jjnm.commit()
+
+        curI.execute(queryU,{'n':row[0],'si':row[5],'f':row[6],'u':row[1],'t':row[4],'m':row[2],'s':row[3]})
+        if curI.rowcount == 0:
+                curI.execute(query)
+        jjnm.commit()
 
 #-----------USER_HAS_ROLE----------#
 tab_del = """DELETE FROM USER_HAS_ROLE"""
@@ -107,6 +135,7 @@ for row in res:
                 VALUES('%d','%d')""" % (row[0],row[1])
     curI.execute(query)
     jjnm.commit()
+
 #--------TABLESPACES_USERS---------#
 tabus_del = """DELETE FROM TABLESPACE_USER"""
 curI.execute(tabus_del)
@@ -135,10 +164,8 @@ for row in res:
         if (len(c)>0 and len(ex2.fetchall())>0):
                 curI.execute(query)
                 jjnm.commit()
-#----------DATAFILES--------#
-data_del = """DELETE FROM DATAFILE_T"""
-curI.execute(data_del)
 
+#----------DATAFILES--------#
 datafiles_ST = """
         SELECT FILE_NAME, FILE_ID, TABLESPACE_NAME, BYTES, STATUS, AUTOEXTENSIBLE,
         USER_BYTES
@@ -148,6 +175,17 @@ datafiles_ST = """
 res = cur.execute(datafiles_ST)
 
 for row in res:
+        queryU = """
+                UPDATE DATAFILE_T
+                        SET NAME_DATAFILE = :n,
+                        USER_BYTES = :u,
+                        AUTOEXTENSIBLE = :a,
+                        STATUS = :s,
+                        BYTES = :b,
+                        NAME_TABLESPACE = :nt
+                WHERE DATAFILE_ID = :id
+                """
+
         query = """INSERT INTO DATAFILE_T(
                 DATAFILE_ID,NAME_DATAFILE,USER_BYTES,AUTOEXTENSIBLE,
                 STATUS,BYTES,NAME_TABLESPACE)
@@ -157,22 +195,13 @@ for row in res:
                 where NAME_TABLESPACE = '%s' """ % row[2]
 
         ex = curI.execute(existe)
-        
         if len(ex.fetchall())>0:
-                curI.execute(query)
+                curI.execute(queryU,{'id':row[1],'n':row[0],'u':row[6],'a':row[5],'s':row[4],'b':row[3],'nt':row[2]})
+                if curI.rowcount == 0:
+                        curI.execute(query)
                 jjnm.commit()
 
 #---------SESSIONS----------#
-sessions_del = """DELETE FROM SESSIONS"""
-#curI.execute(sessions_del)
-
-sessions_drop_seq = """DROP SEQUENCE sessions_inc"""
-curI.execute(sessions_drop_seq)
-sessions_cre_seq = """CREATE SEQUENCE sessions_inc START WITH 1"""
-curI.execute(sessions_cre_seq)
-
-
-
 sessions_ST = """
         SELECT
         s.username,
@@ -202,9 +231,6 @@ sessions_ST = """
 res = cur.execute(sessions_ST)
 
 for row in res:
-        query = """INSERT INTO SESSIONS(USERNAME,SERIAL,
-                CPU,WAIT_SESSIONS,USER_ID)
-                VALUES('%s','%d','%d','%d','%d')""" % (row[0],row[2],row[4],row[3],row[5])
         queryU = """
                 UPDATE SESSIONS
                         SET USERNAME = :u,
@@ -214,22 +240,16 @@ for row in res:
                         USER_ID = :id
                 WHERE SERIAL = :s
                 """
+        query = """INSERT INTO SESSIONS(USERNAME,SERIAL,
+                                CPU,WAIT_SESSIONS,USER_ID)
+                                VALUES('%s','%d','%d','%d','%d')""" % (row[0],row[2],row[4],row[3],row[5])
         rowCount = curI.execute(queryU,{'u':row[0],'s':row[2],'c':row[4],'ws':row[3],'id':row[5]})
         
         if curI.rowcount == 0:
                 curI.execute(query)
-        #curI.execute(query)
         jjnm.commit()
 
 #---------Memory--------#
-memory_del = """DELETE FROM MEMORY_T"""
-curI.execute(memory_del)
-
-memory_drop_seq = """DROP SEQUENCE memory_inc"""
-curI.execute(memory_drop_seq)
-memory_cre_seq = """CREATE SEQUENCE memory_inc START WITH 1"""
-curI.execute(memory_cre_seq)
-
 memory_ST1 = """
         SELECT
         s.name,s.bytes/(1024*1024) MB 
@@ -265,59 +285,129 @@ dataStorage_ST = """SELECT
 res = cur.execute(memory_ST1)
 for row in res:
         if(row[0]=='buffer_cache'):
+                queryU = """
+                        UPDATE MEMORY_T
+                                SET BUFFER_CACHE_MEMORY = :p,
+                                NAME_TABLESPACE = :n,
+                        WHERE MEMORY_ID = :id
+                        """               
                 query = """INSERT INTO MEMORY_T(
                         BUFFER_CACHE_MEMORY,NAME_TABLESPACE)
                         VALUES('%d','%s')""" % (row[1],'SYSTEM')
         else:
+                queryU = """
+                        UPDATE MEMORY_T
+                                SET SHARED_IO_POOL = :p,
+                                NAME_TABLESPACE = :n,
+                        WHERE MEMORY_ID = :id
+                        """  
                 query = """INSERT INTO MEMORY_T(
                         SHARED_IO_POOL,NAME_TABLESPACE)
                         VALUES('%d','%s')""" % (row[1],'SYSTEM')
-        curI.execute(query)
+        
+        curI.execute(queryU,{'p':row[1],'n':'SYSTEM'})
+        if curI.rowcount == 0:
+                curI.execute(query)
         jjnm.commit()
+
 res = cur.execute(memory_ST2)
 
 for row in res:
         if(row[0]=='Java Pool Size'):
+                queryU = """
+                        UPDATE MEMORY_T
+                                SET JAVA_POOL = :p,
+                                NAME_TABLESPACE = :n,
+                        WHERE MEMORY_ID = :id
+                        """  
                 query = """INSERT INTO MEMORY_T(
                         JAVA_POOL,NAME_TABLESPACE)
                         VALUES('%d','%s')""" % (row[1],'SYSTEM')
         if(row[0]=='Large Pool Size'):
+                queryU = """
+                        UPDATE MEMORY_T
+                                SET LARGE_POOL = :p,
+                                NAME_TABLESPACE = :n,
+                        WHERE MEMORY_ID = :id
+                        """  
                 query = """INSERT INTO MEMORY_T(
                         LARGE_POOL,NAME_TABLESPACE)
                         VALUES('%d','%s')""" % (row[1],'SYSTEM')
         if(row[0]=='Shared Pool Size'):
+                queryU = """
+                        UPDATE MEMORY_T
+                                SET SHARED_POOL_MEMORY = :p,
+                                NAME_TABLESPACE = :n,
+                        WHERE MEMORY_ID = :id
+                        """  
                 query = """INSERT INTO MEMORY_T(
                         SHARED_POOL_MEMORY,NAME_TABLESPACE)
                         VALUES('%d','%s')""" % (row[1],'SYSTEM')
         if(row[0]=='Streams Pool Size'):
+                queryU = """
+                        UPDATE MEMORY_T
+                                SET STREAM_POOL = :p,
+                                NAME_TABLESPACE = :n,
+                        WHERE MEMORY_ID = :id
+                        """  
                 query = """INSERT INTO MEMORY_T(
                         STREAM_POOL,NAME_TABLESPACE)
                         VALUES('%d','%s')""" % (row[1],'SYSTEM')
-        curI.execute(query)
+        
+        curI.execute(queryU,{'p':row[1],'n':'SYSTEM'})
+        if curI.rowcount == 0:
+                curI.execute(query)
         jjnm.commit()
 res = cur.execute(memory_ST3)
 
 for row in res:
+        queryU = """
+                UPDATE MEMORY_T
+                        SET PGA = :p,
+                        NAME_TABLESPACE = :n,
+                WHERE MEMORY_ID = :id
+                """  
         query = """INSERT INTO MEMORY_T(
                    PGA,NAME_TABLESPACE)
                    VALUES('%d','%s')""" % (row[0],'SYSTEM')
-        curI.execute(query)
+        
+        curI.execute(queryU,{'p':row[0],'n':'SYSTEM'})
+        if curI.rowcount == 0:
+                curI.execute(query)
         jjnm.commit()
 res = cur.execute(memory_ST4)
 
 for row in res:
+        queryU = """
+                UPDATE MEMORY_T
+                        SET SGA = :p,
+                        NAME_TABLESPACE = :n,
+                WHERE MEMORY_ID = :id
+                """  
         query = """INSERT INTO MEMORY_T(
                    SGA,NAME_TABLESPACE)
                    VALUES('%d','%s')""" % (row[0],'SYSTEM')
-        curI.execute(query)
+        
+        curI.execute(queryU,{'p':row[0],'n':'SYSTEM'})
+        if curI.rowcount == 0:
+                curI.execute(query)
         jjnm.commit()
 res = cur.execute(dataStorage_ST)
 
 for row in res:
+        queryU = """
+                UPDATE MEMORY_T
+                        SET DATA_STORAGE = :d,
+                        NAME_TABLESPACE = :n,
+                WHERE MEMORY_ID = :id
+                """  
         query = """INSERT INTO MEMORY_T(
                    DATA_STORAGE,NAME_TABLESPACE)
                    VALUES('%d','%s')""" % (row[0],'SYSTEM')
-        curI.execute(query)
+        
+        curI.execute(queryU,{'p':row[0],'n':'SYSTEM'})
+        if curI.rowcount==0:
+                curI.execute(query)
         jjnm.commit()
 cur.close()
 curI.close()
