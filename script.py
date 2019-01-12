@@ -20,11 +20,13 @@ res = cur.execute(users_ST)
 for row in res:
     if row[2] is not None:
         ed =  row[2].strftime('%d.%m.%Y')
-        query1 = """INSERT INTO USER_T(
+    else:
+        ed = row[2]
+    query1 = """INSERT INTO USER_T(
         USER_ID,USERNAME,EXPIRATION_DATE,
         STATUS,CREATED_DATE)
         VALUES ('%d','%s',TO_DATE('%s','dd.mm.yyyy'),'%s',TO_DATE('%s','dd.mm.yyyy')) """ % (int(row[4]), row[0], ed, row[1], row[3].strftime('%d.%m.%Y'))
-        queryU = """ UPDATE USER_T
+    queryU = """ UPDATE USER_T
                 SET USER_ID = :id,
                 USERNAME = :n,
                 EXPIRATION_DATE = TO_DATE(:ed,'dd.mm.yyyy'),
@@ -33,28 +35,10 @@ for row in res:
                 where USER_ID = :id
         """
 
-        curI.execute(queryU,{'id':row[4],'n':row[0],'ed':ed,'s':row[1],'cd':row[3]})
-        if curI.rowcount ==0:
-                curI.execute(query1,{'id':row[4],'n':row[0],'ed':ed,'s':row[1],'cd':row[3].strftime('%d.%m.%Y')})
-    else:
-        ed = 'null'
-        queryU = """ UPDATE USER_T
-                SET USER_ID = :id,
-                USERNAME = :n,
-                EXPIRATION_DATE = TO_DATE(:ed,'dd.mm.yyyy'),
-                STATUS = :s,
-                CREATED_DATE = TO_DATE(:cd,'dd.mm.yyyy')
-                where USER_ID = :id
-        """
+    curI.execute(queryU,{'id':(int(row[4])),'n':row[0],'ed':ed,'s':row[1],'cd':row[3].strftime('%d.%m.%Y')})
+    if curI.rowcount ==0:
+       curI.execute(query1)
 
-        query2 = """INSERT INTO USER_T(
-        USER_ID,USERNAME,EXPIRATION_DATE,
-        STATUS,CREATED_DATE)
-        VALUES ('%d','%s',TO_DATE(%s,'dd.mm.yyyy'),'%s',TO_DATE('%s','dd.mm.yyyy')) """ % (row[4], row[0],ed, row[1], row[3].strftime('%d.%m.%Y'))
-
-        curI.execute(queryU,{'id':row[4],'n':row[0],'ed':ed,'s':row[1],'cd':row[3]})
-        if curI.rowcount ==0:
-                curI.execute(query2,{'id':row[4],'n':row[0],'ed':ed,'s':row[1],'cd':row[3].strftime('%d.%m.%Y')})
 
     jjnm.commit()
 
@@ -285,129 +269,58 @@ dataStorage_ST = """SELECT
 res = cur.execute(memory_ST1)
 for row in res:
         if(row[0]=='buffer_cache'):
-                queryU = """
-                        UPDATE MEMORY_T
-                                SET BUFFER_CACHE_MEMORY = :p,
-                                NAME_TABLESPACE = :n,
-                        WHERE MEMORY_ID = :id
-                        """               
-                query = """INSERT INTO MEMORY_T(
-                        BUFFER_CACHE_MEMORY,NAME_TABLESPACE)
-                        VALUES('%d','%s')""" % (row[1],'SYSTEM')
+                buffer_cache = row[1]
         else:
-                queryU = """
-                        UPDATE MEMORY_T
-                                SET SHARED_IO_POOL = :p,
-                                NAME_TABLESPACE = :n,
-                        WHERE MEMORY_ID = :id
-                        """  
-                query = """INSERT INTO MEMORY_T(
-                        SHARED_IO_POOL,NAME_TABLESPACE)
-                        VALUES('%d','%s')""" % (row[1],'SYSTEM')
-        
-        curI.execute(queryU,{'p':row[1],'n':'SYSTEM'})
-        if curI.rowcount == 0:
-                curI.execute(query)
-        jjnm.commit()
+                io_pool = row[1]
 
 res = cur.execute(memory_ST2)
 
 for row in res:
         if(row[0]=='Java Pool Size'):
-                queryU = """
-                        UPDATE MEMORY_T
-                                SET JAVA_POOL = :p,
-                                NAME_TABLESPACE = :n,
-                        WHERE MEMORY_ID = :id
-                        """  
-                query = """INSERT INTO MEMORY_T(
-                        JAVA_POOL,NAME_TABLESPACE)
-                        VALUES('%d','%s')""" % (row[1],'SYSTEM')
+                java_pool = row[1]
         if(row[0]=='Large Pool Size'):
-                queryU = """
-                        UPDATE MEMORY_T
-                                SET LARGE_POOL = :p,
-                                NAME_TABLESPACE = :n,
-                        WHERE MEMORY_ID = :id
-                        """  
-                query = """INSERT INTO MEMORY_T(
-                        LARGE_POOL,NAME_TABLESPACE)
-                        VALUES('%d','%s')""" % (row[1],'SYSTEM')
+                large_pool = row[1]
         if(row[0]=='Shared Pool Size'):
-                queryU = """
-                        UPDATE MEMORY_T
-                                SET SHARED_POOL_MEMORY = :p,
-                                NAME_TABLESPACE = :n,
-                        WHERE MEMORY_ID = :id
-                        """  
-                query = """INSERT INTO MEMORY_T(
-                        SHARED_POOL_MEMORY,NAME_TABLESPACE)
-                        VALUES('%d','%s')""" % (row[1],'SYSTEM')
+                shared_pool = row[1]
         if(row[0]=='Streams Pool Size'):
-                queryU = """
-                        UPDATE MEMORY_T
-                                SET STREAM_POOL = :p,
-                                NAME_TABLESPACE = :n,
-                        WHERE MEMORY_ID = :id
-                        """  
-                query = """INSERT INTO MEMORY_T(
-                        STREAM_POOL,NAME_TABLESPACE)
-                        VALUES('%d','%s')""" % (row[1],'SYSTEM')
+                streams_pool = row[1]
         
-        curI.execute(queryU,{'p':row[1],'n':'SYSTEM'})
-        if curI.rowcount == 0:
-                curI.execute(query)
-        jjnm.commit()
 res = cur.execute(memory_ST3)
 
 for row in res:
-        queryU = """
-                UPDATE MEMORY_T
-                        SET PGA = :p,
-                        NAME_TABLESPACE = :n,
-                WHERE MEMORY_ID = :id
-                """  
-        query = """INSERT INTO MEMORY_T(
-                   PGA,NAME_TABLESPACE)
-                   VALUES('%d','%s')""" % (row[0],'SYSTEM')
-        
-        curI.execute(queryU,{'p':row[0],'n':'SYSTEM'})
-        if curI.rowcount == 0:
-                curI.execute(query)
-        jjnm.commit()
+        pga = row[0]
 res = cur.execute(memory_ST4)
 
 for row in res:
-        queryU = """
-                UPDATE MEMORY_T
-                        SET SGA = :p,
-                        NAME_TABLESPACE = :n,
-                WHERE MEMORY_ID = :id
-                """  
-        query = """INSERT INTO MEMORY_T(
-                   SGA,NAME_TABLESPACE)
-                   VALUES('%d','%s')""" % (row[0],'SYSTEM')
+        sga = row[0]
         
-        curI.execute(queryU,{'p':row[0],'n':'SYSTEM'})
-        if curI.rowcount == 0:
-                curI.execute(query)
-        jjnm.commit()
 res = cur.execute(dataStorage_ST)
 
 for row in res:
-        queryU = """
-                UPDATE MEMORY_T
-                        SET DATA_STORAGE = :d,
-                        NAME_TABLESPACE = :n,
-                WHERE MEMORY_ID = :id
+        data_storage = row[0]
+
+queryU = """
+        UPDATE MEMORY_T
+                SET PGA = :p,
+                DATA_STORAGE = :ds,
+                SGA = :sga,
+                SHARED_IO_POOL = :sp,
+                BUFFER_CACHE_MEMORY = :bm,
+                LARGE_POOL = :lp,
+                JAVA_POOL = :jp,
+                STREAM_POOL = :spo,
+                NAME_TABLESPACE = :sys
+                WHERE NAME_TABLESPACE = :sys
                 """  
-        query = """INSERT INTO MEMORY_T(
-                   DATA_STORAGE,NAME_TABLESPACE)
-                   VALUES('%d','%s')""" % (row[0],'SYSTEM')
+query = """INSERT INTO MEMORY_T(PGA,DATA_STORAGE,
+                SGA,SHARED_IO_POOL,
+                BUFFER_CACHE_MEMORY,LARGE_POOL,JAVA_POOL,
+                STREAM_POOL,NAME_TABLESPACE)
+                VALUES('%d','%d','%d','%d','%d','%d','%d','%d','%s')""" % (pga,data_storage,sga,shared_pool,buffer_cache,large_pool,java_pool,streams_pool,'SYSTEM')
         
-        curI.execute(queryU,{'p':row[0],'n':'SYSTEM'})
-        if curI.rowcount==0:
-                curI.execute(query)
-        jjnm.commit()
+curI.execute(queryU,{'p':pga,'ds':data_storage,'sga':sga,'sp':shared_pool,'bm':buffer_cache,'lp':large_pool,'jp':java_pool,'spo':streams_pool,'sys':'SYSTEM'})
+if curI.rowcount==0:
+   curI.execute(query)
+jjnm.commit()
 cur.close()
 curI.close()
