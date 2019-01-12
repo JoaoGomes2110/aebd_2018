@@ -20,13 +20,11 @@ res = cur.execute(users_ST)
 for row in res:
     if row[2] is not None:
         ed =  row[2].strftime('%d.%m.%Y')
-    else:
-        ed = row[2]
-    query1 = """INSERT INTO USER_T(
+        query1 = """INSERT INTO USER_T(
         USER_ID,USERNAME,EXPIRATION_DATE,
         STATUS,CREATED_DATE)
         VALUES ('%d','%s',TO_DATE('%s','dd.mm.yyyy'),'%s',TO_DATE('%s','dd.mm.yyyy')) """ % (int(row[4]), row[0], ed, row[1], row[3].strftime('%d.%m.%Y'))
-    queryU = """ UPDATE USER_T
+        queryU = """ UPDATE USER_T
                 SET USER_ID = :id,
                 USERNAME = :n,
                 EXPIRATION_DATE = TO_DATE(:ed,'dd.mm.yyyy'),
@@ -34,11 +32,27 @@ for row in res:
                 CREATED_DATE = TO_DATE(:cd,'dd.mm.yyyy')
                 where USER_ID = :id
         """
+        
+        curI.execute(queryU,{'id':(int(row[4])),'n':row[0],'ed':ed,'s':row[1],'cd':row[3].strftime('%d.%m.%Y')})
+        #curI.execute(query1)
+    else:
+        ed = 'null'
+        query1 = """INSERT INTO USER_T(
+        USER_ID,USERNAME,EXPIRATION_DATE,
+        STATUS,CREATED_DATE)
+        VALUES ('%d','%s',TO_DATE(%s,'dd.mm.yyyy'),'%s',TO_DATE('%s','dd.mm.yyyy')) """ % (int(row[4]), row[0],ed, row[1], row[3].strftime('%d.%m.%Y'))
+        queryU = """ UPDATE USER_T
+                SET USER_ID = :id,
+                USERNAME = :n,
+                EXPIRATION_DATE = TO_DATE(:ed,'dd.mm.yyyy'),
+                STATUS = :s,
+                CREATED_DATE = TO_DATE(:cd,'dd.mm.yyyy')
+                where USER_ID = :id
+        """
+        curI.execute(queryU,{'id':(int(row[4])),'n':row[0],'ed':ed,'s':row[1],'cd':row[3].strftime('%d.%m.%Y')})
 
-    curI.execute(queryU,{'id':(int(row[4])),'n':row[0],'ed':ed,'s':row[1],'cd':row[3].strftime('%d.%m.%Y')})
     if curI.rowcount ==0:
-       curI.execute(query1)
-
+        curI.execute(query1)
 
     jjnm.commit()
 
