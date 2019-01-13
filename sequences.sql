@@ -13,7 +13,7 @@ BEGIN
   SELECT data_history_inc.NEXTVAL
   INTO   :new.DATAFILE_HISTORY_ID
   FROM   dual;
-END;
+END data_history_trig;
 
 CREATE OR REPLACE TRIGGER memory_history_trig 
 BEFORE INSERT ON MEMORY_HISTORY 
@@ -22,7 +22,7 @@ BEGIN
   SELECT MEMORY_HISTORY_INC.NEXTVAL
   INTO   :new.MEMORY_HISTORY_ID
   FROM   dual;
-END;
+END memory_history_trig;
 
 CREATE OR REPLACE TRIGGER memory_trig 
 BEFORE INSERT ON MEMORY_T
@@ -31,7 +31,7 @@ BEGIN
   SELECT memory_inc.NEXTVAL
   INTO   :new.MEMORY_ID
   FROM   dual;
-END;
+END memory_trig;
 
 CREATE OR REPLACE TRIGGER sessions_trig 
 BEFORE INSERT ON SESSIONS
@@ -40,7 +40,7 @@ BEGIN
   SELECT sessions_inc.NEXTVAL
   INTO   :new.SESSIONS_ID
   FROM   dual;
-END;
+END sessions_trig;
 
 CREATE OR REPLACE TRIGGER sessions_history_trig 
 BEFORE INSERT ON SESSIONS_HISTORY 
@@ -49,7 +49,7 @@ BEGIN
   SELECT sessions_history_inc.NEXTVAL
   INTO   :new.SESSIONS_HISTORY_ID
   FROM   dual;
-END;
+END sessions_history_trig;
 
 CREATE OR REPLACE TRIGGER tablespace_history_trig 
 BEFORE INSERT ON TABLESPACE_HISTORY 
@@ -58,7 +58,7 @@ BEGIN
   SELECT tablespace_history_inc.NEXTVAL
   INTO   :new.TABLESPACE_HISTORY_ID
   FROM   dual;
-END;
+END tablespace_history_trig;
 
 CREATE OR REPLACE TRIGGER user_history_trig 
 BEFORE INSERT ON USER_HISTORY 
@@ -67,4 +67,4 @@ BEGIN
   SELECT user_history_inc.NEXTVAL
   INTO   :new.USER_HISTORY_ID
   FROM   dual;
-END;
+END user_history_trig;
