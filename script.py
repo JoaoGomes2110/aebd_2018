@@ -32,7 +32,7 @@ for row in res:
                 CREATED_DATE = TO_DATE(:cd,'dd.mm.yyyy')
                 where USER_ID = :id
         """
-        
+       
         curI.execute(queryU,{'id':(int(row[4])),'n':row[0],'ed':ed,'s':row[1],'cd':row[3].strftime('%d.%m.%Y')})
         #curI.execute(query1)
     else:
@@ -42,14 +42,14 @@ for row in res:
         STATUS,CREATED_DATE)
         VALUES ('%d','%s',TO_DATE(%s,'dd.mm.yyyy'),'%s',TO_DATE('%s','dd.mm.yyyy')) """ % (int(row[4]), row[0],ed, row[1], row[3].strftime('%d.%m.%Y'))
         queryU = """ UPDATE USER_T
-                SET USER_ID = :id,
-                USERNAME = :n,
-                EXPIRATION_DATE = TO_DATE(:ed,'dd.mm.yyyy'),
-                STATUS = :s,
-                CREATED_DATE = TO_DATE(:cd,'dd.mm.yyyy')
-                where USER_ID = :id
-        """
-        curI.execute(queryU,{'id':(int(row[4])),'n':row[0],'ed':ed,'s':row[1],'cd':row[3].strftime('%d.%m.%Y')})
+                SET USER_ID = '%d',
+                USERNAME = '%s',
+                EXPIRATION_DATE = TO_DATE(%s,'dd.mm.yyyy'),
+                STATUS = '%s',
+                CREATED_DATE = TO_DATE('%s','dd.mm.yyyy')
+                where USER_ID = '%d' """ % (int(row[4]), row[0],ed, row[1], row[3].strftime('%d.%m.%Y'),int(row[4]))
+
+        curI.execute(queryU)
 
     if curI.rowcount ==0:
         curI.execute(query1)
