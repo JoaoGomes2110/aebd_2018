@@ -6,26 +6,6 @@ var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 
-// connecção a base de dados
-var oracledb = require('oracledb')
-
-oracledb.getConnection(
-  {
-    user: 'jjnm',
-    password: 'oracle',
-    connectString: '127.0.0.1/orcl' 
-  },
-  (erro,coneccao) =>{
-    if(erro){
-      console.log('Conecção não efetuada!!')
-    }
-    else{
-      console.log('Connecção efectuada com sucesso!!' )
-    }
-  }
-)
-
-
 var app = express();
 
 // view engine setup
@@ -38,7 +18,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+
 app.use('/', indexRouter);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

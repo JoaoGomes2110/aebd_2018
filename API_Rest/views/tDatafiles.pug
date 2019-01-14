@@ -1,0 +1,78 @@
+extends layout
+block content
+    header.w3-theme-d1
+        h1
+            b AEBD API REST
+    .w3-container
+        .w3-row
+            .w3-col.m4.l3       
+                .w3-side-bar.w3-bar-block.w3-collapse.w3-theme-l5.w3-large
+                    h3.w3-bar-item.w3-center.w3-text-teal 
+                        b Menu
+                    ul.w3-ul
+                        li
+                            form.w3-container(action='/python',method='GET')
+                                input.w3-btn.w3-hover-teal(type='submit',value='Run Script Python')
+                        li
+                            form.w3-container(action='/users',method='GET')
+                                input.w3-btn.w3-hover-teal(type='submit',value='Users',id='users')
+                        li
+                            form.w3-container(action='/users/history',method='GET')
+                                input.w3-btn.w3-hover-teal(type='submit',value='Users History')
+                        li
+                            form.w3-container(action='/tablespaces',method='GET')
+                                input.w3-btn.w3-hover-teal(type='submit',value='Tablespaces')
+                        li
+                            form.w3-container(action='/tablespaces/history',method='GET')
+                                input.w3-btn.w3-hover-teal(type='submit',value='Tablespaces History')
+                        li
+                            form.w3-container(action='/datafiles',method='GET')
+                                input.w3-btn.w3-hover-teal(type='submit',value='Datafiles')
+                        li
+                            form.w3-container(action='/datafiles/history',method='GET')
+                                input.w3-btn.w3-hover-teal(type='submit',value='Datafiles History')
+                        li
+                            form.w3-container(action='/sessions',method='GET')
+                                input.w3-btn.w3-hover-teal(type='submit',value='Sessions')
+                        li
+                            form.w3-container(action='/sessions/history',method='GET')
+                                input.w3-btn.w3-hover-teal(type='submit',value='Sessions History')
+                        li
+                            form.w3-container(action='/memory',method='GET')
+                                input.w3-btn.w3-hover-teal(type='submit',value='Memory')
+                        li
+                            form.w3-container(action='/memory/history',method='GET')
+                                input.w3-btn.w3-hover-teal(type='submit',value='Memory History')
+                        li
+                            form.w3-container(action='/roles',method='GET')
+                                input.w3-btn.w3-hover-teal(type='submit',value='Roles')
+                        li
+                            form.w3-container(action='/views',method='GET')
+                                input.w3-btn.w3-hover-teal(type='submit',value='Views')
+                    br
+            .w3-col.m8.l9
+                    h3.w3-center.w3-text-teal
+                        b= nome
+                    .w3-container.w3-responsive
+                        table.w3-table-all
+                            tr.w3-text-teal
+                                th Datafile ID:
+                                th Name:
+                                th User Bytes:
+                                th Autoextensible:
+                                th Status:
+                                th Bytes:
+                                th Tablespace Name:
+                            each t in tabela
+                                tr
+                                    td= t.DATAFILE_ID
+                                    td= t.NAME_DATAFILE
+                                    td= t.USER_BYTES
+                                    td= t.AUTOEXTENSIBLE 
+                                    td= t.STATUS
+                                    td= t.BYTES
+                                    td= t.NAME_TABLESPACE                          
+    br
+    footer.w3-large.w3-theme-d1
+        address
+            b Gerado por AEBD API REST app

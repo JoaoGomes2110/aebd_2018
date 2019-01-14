@@ -11,8 +11,11 @@ block content
                         b Menu
                     ul.w3-ul
                         li
+                            form.w3-container(action='/python',method='GET')
+                                input.w3-btn.w3-hover-teal(type='submit',value='Run Script Python')
+                        li
                             form.w3-container(action='/users',method='GET')
-                                input.w3-btn.w3-hover-teal(type='submit',value='Users')
+                                input.w3-btn.w3-hover-teal(type='submit',value='Users',id='users')
                         li
                             form.w3-container(action='/users/history',method='GET')
                                 input.w3-btn.w3-hover-teal(type='submit',value='Users History')
@@ -43,22 +46,12 @@ block content
                         li
                             form.w3-container(action='/roles',method='GET')
                                 input.w3-btn.w3-hover-teal(type='submit',value='Roles')
+                        li
+                            form.w3-container(action='/views',method='GET')
+                                input.w3-btn.w3-hover-teal(type='submit',value='Views')
+                         
                     br
-            .w3-col.m8.l9
-                    h3.w3-center.w3-text-teal
-                        b= nome
-                    .w3-container
-                        table.w3-table-all(id="tabelaUsers")
-                        table.w3-table-all(id="tabelaUsersHistory")
-                        table.w3-table-all(id="tabelaTablespaces")
-                        table.w3-table-all(id="tabelaTablespacesHistory")
-                        table.w3-table-all(id="tabelaDatafiles")
-                        table.w3-table-all(id="tabelaDatafilesHistory")
-                        table.w3-table-all(id="tabelaSessions")
-                        table.w3-table-all(id="tabelaSessionsHistory")
-                        table.w3-table-all(id="tabelaMemory")
-                        table.w3-table-all(id="tabelaMemoryHistory")
-                        table.w3-table-all(id="tabelaRoles")                       
+            .w3-col.m8.l9            
     br
     footer.w3-large.w3-theme-d1
         address

@@ -1,0 +1,61 @@
+extends layout
+block content
+    header.w3-theme-d1
+        h1
+            b AEBD API REST
+    .w3-container
+        .w3-row
+            .w3-col.m4.l3       
+                .w3-side-bar.w3-bar-block.w3-collapse.w3-theme-l5.w3-large
+                    h3.w3-bar-item.w3-center.w3-text-teal 
+                        b Views
+                    ul.w3-ul
+                        li
+                            form.w3-container(action='/views/tab',method='GET')
+                                input.w3-btn.w3-hover-teal(type='submit',value='Tablespaces with Datafiles')
+                        li
+                            form.w3-container(action='/views/user/status',method='GET')
+                                input.w3-btn.w3-hover-teal(type='submit',value='User Status Open')
+                        li
+                            form.w3-container(action='/views/user/rolesTab',method='GET')
+                                input.w3-btn.w3-hover-teal(type='submit',value='User with Roles and Tablespaces') 
+                        li
+                            form.w3-container(action='/views/user/hist',method='GET')
+                                input.w3-btn.w3-hover-teal(type='submit',value='User history by timestamp')
+                        li
+                            form.w3-container(action='/views/tab/hist',method='GET')
+                                input.w3-btn.w3-hover-teal(type='submit',value='Tablespaces history by timestamp')
+                        li
+                            form.w3-container(action='/views/dat/hist',method='GET')
+                                input.w3-btn.w3-hover-teal(type='submit',value='Datafiles history by timestamp')
+                        li
+                            form.w3-container(action='/views/ses/hist',method='GET')
+                                input.w3-btn.w3-hover-teal(type='submit',value='Sessions history by timestamp')
+                        li
+                            form.w3-container(action='/views/mem/hist',method='GET')
+                                input.w3-btn.w3-hover-teal(type='submit',value='Memory history by timestamp')                        
+                        li
+                            form.w3-container(action='/',method='GET')
+                                input.w3-btn.w3-hover-teal(type='submit',value='Home')
+                    br
+            .w3-col.m8.l9 
+                    h3.w3-center.w3-text-teal
+                        b= nome
+                    .w3-container.w3-responsive
+                        table.w3-table-all
+                            tr.w3-text-teal
+                                th User ID:
+                                th Username:
+                                th Expiration Date:
+                                th Status:
+                                th Created Date:
+                            each t in tabela
+                                tr
+                                    td= t.USER_ID
+                                    td= t.USERNAME
+                                    td= t.EXPIRATION_DATE
+                                    td= t.STATUS
+                                    td= t.CREATED_DATE           
+    footer.w3-large.w3-theme-d1
+        address
+            b Gerado por AEBD API REST app
