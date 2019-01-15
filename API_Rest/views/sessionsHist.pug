@@ -18,7 +18,16 @@ block content
                                 input.w3-btn.w3-hover-teal(type='submit',value='User Status Open')
                         li
                             form.w3-container(action='/views/user/rolesTab',method='GET')
-                                input.w3-btn.w3-hover-teal(type='submit',value='User with Roles and Tablespaces') 
+                                input.w3-btn.w3-hover-teal(type='submit',value='User with Roles and Tablespaces')
+                        li
+                            form.w3-container(action='/views/mem/histcbd',method='GET')
+                                input.w3-btn.w3-hover-teal(type='submit',value='Memory history by PGA')
+                        li
+                            form.w3-container(action='/views/mem/histdba',method='GET')
+                                input.w3-btn.w3-hover-teal(type='submit',value='Memory history by SGA')
+                        li
+                            form.w3-container(action='/views/mem/histdataStorage',method='GET')
+                                input.w3-btn.w3-hover-teal(type='submit',value='Memory history by Data Storage')
                         li
                             form.w3-container(action='/views/user/hist',method='GET')
                                 input.w3-btn.w3-hover-teal(type='submit',value='User history by timestamp')
@@ -33,7 +42,7 @@ block content
                                 input.w3-btn.w3-hover-teal(type='submit',value='Sessions history by timestamp')
                         li
                             form.w3-container(action='/views/mem/hist',method='GET')
-                                input.w3-btn.w3-hover-teal(type='submit',value='Memory history by timestamp')                        
+                                input.w3-btn.w3-hover-teal(type='submit',value='Memory history by timestamp')                          
                         li
                             form.w3-container(action='/',method='GET')
                                 input.w3-btn.w3-hover-teal(type='submit',value='Home')

@@ -68,6 +68,25 @@ Querie.getRoles = async() =>{
     return result
 }
 
+Querie.getMemCDB = async() =>{
+    var query = 'SELECT * FROM MEM_CDB'
+    var result = await ex(query)
+    return result
+}
+
+Querie.getMemDBA = async() =>{
+    var query = 'SELECT * FROM MEM_DBA'
+    var result = await ex(query)
+    return result
+}
+
+Querie.getMemDataStorage = async() =>{
+    var query = 'SELECT * FROM data_storage_mem'
+    var result = await ex(query)
+    return result
+}
+
+
 Querie.getTabDatafiles = async() =>{
     var query = 'SELECT * FROM tab_dataFiles'
     var result = await ex(query)
@@ -116,6 +135,21 @@ Querie.getUserRolesTablespaces = async() =>{
     return result
 }
 
+Querie.getMemHistCDB = async() =>{
+    var query = 'select * from MEM_HIST_CDB'
+    var result = await ex(query)
+    return result
+}
+Querie.getMemHistDBA = async() =>{
+    var query = 'select * from MEM_HIST_DBA'
+    var result = await ex(query)
+    return result
+}
+Querie.getMemHistDataStorage = async() =>{
+    var query = 'select * from data_storage'
+    var result = await ex(query)
+    return result
+}
 
 const ex = (query) => {
     return new Promise((resove, reject) => {

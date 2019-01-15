@@ -41,6 +41,15 @@ block content
                             form.w3-container(action='/memory',method='GET')
                                 input.w3-btn.w3-hover-teal(type='submit',value='Memory')
                         li
+                            form.w3-container(action='/memory/cdb',method='GET')
+                                input.w3-btn.w3-hover-teal(type='submit',value='Memory By PGA')
+                        li
+                            form.w3-container(action='/memory/dba',method='GET')
+                                input.w3-btn.w3-hover-teal(type='submit',value='Memory PGA and SGA')
+                        li
+                            form.w3-container(action='/memory/dataStorage',method='GET')
+                                input.w3-btn.w3-hover-teal(type='submit',value='Memory Data Storage')
+                        li
                             form.w3-container(action='/memory/history',method='GET')
                                 input.w3-btn.w3-hover-teal(type='submit',value='Memory History')
                         li

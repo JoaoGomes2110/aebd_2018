@@ -65,42 +65,12 @@ block content
                     .w3-container.w3-responsive
                         table.w3-table-all
                             tr.w3-text-teal
-                                th ID:
-                                th Timestamp:
-                                th Datafile ID:
-                                th Datafile Name:
-                                th User Bytes:
-                                th Autoextensible:
-                                th Status:
-                                th Bytes:
-                                th Tablespace Name:
+                                th PGA: 
+                                th SGA:
                             each t in tabela
                                 tr
-                                    td= t.DATAFILE_HISTORY_ID
-                                    td= t.TIME_STAMP
-                                    td= t.DATAFILE_ID 
-                                    td= t.NAME_DATAFILE
-                                    if t.USER_BYTES
-                                        td= t.USER_BYTES
-                                    else 
-                                        td 
-                                            b N/A
-                                    if t.AUTOEXTENSIBLE
-                                        td= t.AUTOEXTENSIBLE
-                                    else 
-                                        td 
-                                            b N/A
-                                    if t.STATUS
-                                        td= t.STATUS
-                                    else 
-                                        td 
-                                            b N/A
-                                    if t.BYTES
-                                        td= t.BYTES
-                                    else 
-                                        td 
-                                            b N/A
-                                    td= t.NAME_TABLESPACE                              
+                                    td= t.PGA 
+                                    td= t.SGA                                                            
     br
     footer.w3-large.w3-theme-d1
         address

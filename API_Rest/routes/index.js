@@ -151,6 +151,39 @@ router.get('/roles',(req,res)=>{
         })
 })
 
+router.get('/memory/cdb',(req,res)=>{
+      var n = 'Memory by PGA'
+      Querie.getMemCDB()
+           .then(dados => res.render('tMemoryCDB',{nome:n,tabela:dados}))
+           .catch(erro => {
+                res.render('index')
+                console.log("Error: " + erro)
+            })
+})
+
+router.get('/memory/dba',(req,res)=>{
+      var n = 'Memory PGA and SGA'
+      Querie.getMemDBA()
+           .then(dados => res.render('tMemoryDBA',{nome:n,tabela:dados}))
+           .catch(erro => {
+                res.render('index')
+                console.log("Error: " + erro)
+            })
+})
+
+router.get('/memory/dataStorage',(req,res)=>{
+      var n = 'Data Storage Memory '
+      Querie.getMemDataStorage()
+           .then(dados => res.render('tMemoryDataStorage',{nome:n,tabela:dados}))
+           .catch(erro => {
+                res.render('index')
+                console.log("Error: " + erro)
+            })
+})
+    
+    
+
+
 
 router.get('/views',(req,res) =>{
     res.render('views')
@@ -235,5 +268,39 @@ router.get('/views/user/status',(req,res)=>{
                 console.log("Error: " + erro)
         }) 
 })
+
+router.get('/views/mem/histcbd',(req,res)=>{
+      var n = 'Memory History by PGA'
+      Querie.getMemHistCDB()
+            .then(dados => res.render('memhistCDB',{nome:n,tabela:dados}))
+            .catch(erro => {
+                  res.render('index')
+                  console.log("Error: " + erro)
+          }) 
+})
+
+router.get('/views/mem/histdba',(req,res)=>{
+      var n = 'Memory History by SGA'
+      Querie.getMemHistDBA()
+            .then(dados => res.render('memhistDBA',{nome:n,tabela:dados}))
+            .catch(erro => {
+                  res.render('index')
+                  console.log("Error: " + erro)
+          }) 
+})
+
+router.get('/views/mem/histdataStorage',(req,res)=>{
+      var n = 'Memory History by Data Storage'
+      Querie.getMemHistDataStorage()
+            .then(dados => res.render('memhistDataStorage',{nome:n,tabela:dados}))
+            .catch(erro => {
+                  res.render('index')
+                  console.log("Error: " + erro)
+          }) 
+})
+
+
+
+
 
 module.exports = router;

@@ -53,18 +53,24 @@ block content
                     .w3-container.w3-responsive
                         table.w3-table-all
                             tr.w3-text-teal
-                                th Name Tablespace:
-                                th Type Tablespace:
-                                th Free Space:
-                                th Autoextensible:
-                                th Status:
+                                th PGA:
+                                th Shared I/O POOL:
+                                th Shared Pool Memory:
+                                th Buffer Cache Memory:
+                                th Large Pool:
+                                th Java Pool:
+                                th Stream Pool:
+                                th Timestamp:
                             each t in tabela
                                 tr
-                                    td= t.NAME_TABLESPACE
-                                    td= t.TYPE_TABLESPACE
-                                    td= t.FREE_SPACE
-                                    td= t.AUTOEXTENSIBLE
-                                    td= t.STATUS           
+                                    td= t.PGA
+                                    td= t.SHARED_IO_POOL
+                                    td= t.SHARED_POOL_MEMORY
+                                    td= t.BUFFER_CACHE_MEMORY
+                                    td= t.LARGE_POOL
+                                    td= t.JAVA_POOL
+                                    td= t.STREAM_POOL
+                                    td= t.TIME_STAMP           
     footer.w3-large.w3-theme-d1
         address
             b Gerado por AEBD API REST app

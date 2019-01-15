@@ -53,18 +53,12 @@ block content
                     .w3-container.w3-responsive
                         table.w3-table-all
                             tr.w3-text-teal
-                                th Name Tablespace:
-                                th Type Tablespace:
-                                th Free Space:
-                                th Autoextensible:
-                                th Status:
+                                th Data Storage:
+                                th Timestamp:
                             each t in tabela
                                 tr
-                                    td= t.NAME_TABLESPACE
-                                    td= t.TYPE_TABLESPACE
-                                    td= t.FREE_SPACE
-                                    td= t.AUTOEXTENSIBLE
-                                    td= t.STATUS           
+                                    td= t.DATA_STORAGE
+                                    td= t.TIME_STAMP          
     footer.w3-large.w3-theme-d1
         address
             b Gerado por AEBD API REST app
